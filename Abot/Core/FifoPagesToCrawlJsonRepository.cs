@@ -11,14 +11,17 @@ namespace Abot.Core
     {
         ConcurrentQueue<PageToCrawl> _urlQueue = new ConcurrentQueue<PageToCrawl>();
         string _path;
+        int _interval;
 
         public FifoPagesToCrawlJsonRepository()
         {
+            _interval = 100;
         }
 
-        public FifoPagesToCrawlJsonRepository(string FullPath)
+        public FifoPagesToCrawlJsonRepository(string FullPath, int SerializeInterval)
         {
             _path = FullPath;
+            _interval = SerializeInterval;
             Deserialize();
         }
 
@@ -55,7 +58,7 @@ namespace Abot.Core
         {
             if (_path == string.Empty) return;
 
-            if (Count() % 1 == 0)
+            if (Count() % _interval == 0)
             {
                 string serialized = JsonConvert.SerializeObject(_urlQueue);
                 File.WriteAllText(_path, serialized);

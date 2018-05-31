@@ -16,14 +16,17 @@ namespace Abot.Core
     {
         private ConcurrentDictionary<long, byte> m_UrlRepository = new ConcurrentDictionary<long, byte>();
         string _path;
+        int _interval;
 
         public CompactCrawledUrlJsonRepository()
         {
+            _interval = 100;
         }
 
-        public CompactCrawledUrlJsonRepository(string FullPath)
+        public CompactCrawledUrlJsonRepository(string FullPath, int SerializeInterval)
         {
             _path = FullPath;
+            _interval = SerializeInterval;
             Deserialize();
         }
 
@@ -71,7 +74,7 @@ namespace Abot.Core
         {
             if (_path == string.Empty) return;
 
-            if (m_UrlRepository.Count % 1 == 0)
+            if (m_UrlRepository.Count % _interval == 0)
             {
                 string serialized = JsonConvert.SerializeObject(m_UrlRepository);
                 File.WriteAllText(_path, serialized);
