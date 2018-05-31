@@ -3,12 +3,6 @@ using System.Collections.Concurrent;
 
 namespace Abot.Core
 {
-    public interface ICrawledUrlRepository : IDisposable
-    {
-        bool Contains(Uri uri);
-        bool AddIfNew(Uri uri);
-    }
-
     [Serializable]
     public class InMemoryCrawledUrlRepository : ICrawledUrlRepository
     {

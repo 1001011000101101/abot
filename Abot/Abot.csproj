@@ -68,6 +68,9 @@
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Robots, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NRobotsPatched.1.0.8.0\lib\net40\Robots.dll</HintPath>
       <Private>True</Private>
@@ -93,8 +96,13 @@
   <ItemGroup>
     <Compile Include="Core\AbotConfigurationSectionHandler.cs" />
     <Compile Include="Core\BloomFilterCrawledUrlRepository.cs" />
+    <Compile Include="Core\CompactCrawledUrlJsonRepository.cs" />
     <Compile Include="Core\CompactCrawledUrlRepository.cs" />
     <Compile Include="Core\AngleSharpHyperLinkParser.cs" />
+    <Compile Include="Core\FifoPagesToCrawlJsonRepository.cs" />
+    <Compile Include="Core\ICrawledUrlRepository.cs" />
+    <Compile Include="Core\IPagesToCrawlRepository.cs" />
+    <Compile Include="Core\IScheduler.cs" />
     <Compile Include="Crawler\RobotsDotTextParseCompletedArgs.cs" />
     <Compile Include="Poco\HttpWebResponseWrapper.cs" />
     <Compile Include="Util\BloomFilter.cs" />

@@ -4,15 +4,6 @@ using System.Collections.Concurrent;
 
 namespace Abot.Core
 {
-    public interface IPagesToCrawlRepository : IDisposable
-    {
-        void Add(PageToCrawl page);
-        PageToCrawl GetNext();
-        void Clear();
-        int Count();
-
-    }
-
     [Serializable]
     public class FifoPagesToCrawlRepository : IPagesToCrawlRepository
     {
