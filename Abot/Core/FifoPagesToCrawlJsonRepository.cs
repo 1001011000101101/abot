@@ -3,6 +3,8 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Abot.Core;
 
 namespace Abot.Core
 {
@@ -78,9 +80,10 @@ namespace Abot.Core
 
             if (File.Exists(_path))
             {
-                _urlQueue = JsonConvert.DeserializeObject<ConcurrentQueue<PageToCrawl>>(File.ReadAllText(_path));
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.Converters.Add(new ResultConverter());
+                _urlQueue = JsonConvert.DeserializeObject<ConcurrentQueue<PageToCrawl>>(File.ReadAllText(_path), settings);
             }
         }
     }
-
 }

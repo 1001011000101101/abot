@@ -103,6 +103,7 @@
     <Compile Include="Core\ICrawledUrlRepository.cs" />
     <Compile Include="Core\IPagesToCrawlRepository.cs" />
     <Compile Include="Core\IScheduler.cs" />
+    <Compile Include="Core\ResultConverter.cs" />
     <Compile Include="Crawler\RobotsDotTextParseCompletedArgs.cs" />
     <Compile Include="Poco\HttpWebResponseWrapper.cs" />
     <Compile Include="Util\BloomFilter.cs" />
