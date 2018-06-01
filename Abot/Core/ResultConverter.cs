@@ -46,6 +46,5 @@ namespace Abot.Core
         {
             throw new NotImplementedException();
         }
-
     }
 }
