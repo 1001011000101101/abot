@@ -22,6 +22,8 @@ namespace Abot.Core
             JObject jo = JObject.Load(reader);
             PageToCrawl result = new PageToCrawl();
 
+            //This is bad because if PageToCrawl will be changed (added new field for example) 
+            //deserialization will break and it hard to catch this type of error!
             result.Uri = (Uri)jo["Uri"];
             result.ParentUri = (Uri)jo["ParentUri"];
             result.IsRetry = (bool)jo["IsRetry"];
@@ -29,10 +31,12 @@ namespace Abot.Core
             result.RetryCount = (int)jo["RetryCount"];
             result.LastRequest = (DateTime?)jo["LastRequest"];
             result.IsRoot = (bool)jo["IsRoot"];
+            result.IsInternal = (bool)jo["IsInternal"];
             result.CrawlDepth = (int)jo["CrawlDepth"];
             result.RedirectedFrom = jo["RedirectedFrom"].ToObject<CrawledPage>();
             result.RedirectPosition = (int)jo["RedirectPosition"];
             result.PageBag = jo["PageBag"]?.ToObject<ExpandoObject>() ?? new ExpandoObject();
+            
 
             return result;
         }

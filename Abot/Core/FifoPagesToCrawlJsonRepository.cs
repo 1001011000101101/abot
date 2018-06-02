@@ -11,12 +11,13 @@ namespace Abot.Core
     [Serializable]
     public class FifoPagesToCrawlJsonRepository : IPagesToCrawlRepository
     {
-        ConcurrentQueue<PageToCrawl> _urlQueue = new ConcurrentQueue<PageToCrawl>();
+        ConcurrentQueue<PageToCrawl> _urlQueue;
         string _path;
         int _interval;
 
         public FifoPagesToCrawlJsonRepository()
         {
+            _urlQueue = new ConcurrentQueue<PageToCrawl>();
             _interval = 100;
         }
 
@@ -24,13 +25,24 @@ namespace Abot.Core
         {
             _path = FullPath;
             _interval = SerializeInterval;
-            Deserialize();
+
+            _urlQueue = File.Exists(_path) ? Deserialize(_path) : new ConcurrentQueue<PageToCrawl>();
+
+            DirectoryInfo di = new DirectoryInfo(Path.GetDirectoryName(_path));
+            if (!di.Exists)
+            {
+                di.Create();
+            }
         }
 
         public void Add(PageToCrawl page)
         {
             _urlQueue.Enqueue(page);
-            Serialize();
+
+            if (Count() % _interval == 0)
+            {
+                Serialize(_urlQueue, _path);
+            }
         }
 
         public PageToCrawl GetNext()
@@ -56,34 +68,17 @@ namespace Abot.Core
             _urlQueue = null;
         }
 
-        private void Serialize()
+        private void Serialize(ConcurrentQueue<PageToCrawl> UrlQueue, string FullPath)
         {
-            if (_path == string.Empty) return;
-
-            if (Count() % _interval == 0)
-            {
-                string serialized = JsonConvert.SerializeObject(_urlQueue);
-                File.WriteAllText(_path, serialized);
-            }
+            string serialized = JsonConvert.SerializeObject(UrlQueue);
+            File.WriteAllText(FullPath, serialized);
         }
 
-        private void Deserialize()
+        private ConcurrentQueue<PageToCrawl> Deserialize(string FullPath)
         {
-            if (_path == string.Empty) return;
-
-            var di = new DirectoryInfo(Path.GetDirectoryName(_path));
-            if (!di.Exists)
-            {
-                di.Create();
-                return;
-            }
-
-            if (File.Exists(_path))
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.Converters.Add(new ResultConverter());
-                _urlQueue = JsonConvert.DeserializeObject<ConcurrentQueue<PageToCrawl>>(File.ReadAllText(_path), settings);
-            }
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.Converters.Add(new ResultConverter());
+            return JsonConvert.DeserializeObject<ConcurrentQueue<PageToCrawl>>(File.ReadAllText(FullPath), settings);
         }
     }
 }

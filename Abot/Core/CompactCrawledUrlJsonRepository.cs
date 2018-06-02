@@ -14,20 +14,28 @@ namespace Abot.Core
     /// </summary>
     public class CompactCrawledUrlJsonRepository : ICrawledUrlRepository
     {
-        private ConcurrentDictionary<long, byte> m_UrlRepository = new ConcurrentDictionary<long, byte>();
+        private ConcurrentDictionary<long, byte> m_UrlRepository;
         string _path;
         int _interval;
 
         public CompactCrawledUrlJsonRepository()
         {
             _interval = 100;
+            m_UrlRepository = new ConcurrentDictionary<long, byte>();
         }
 
         public CompactCrawledUrlJsonRepository(string FullPath, int SerializeInterval)
         {
             _path = FullPath;
             _interval = SerializeInterval;
-            Deserialize();
+
+            m_UrlRepository = File.Exists(_path) ? Deserialize(_path) : new ConcurrentDictionary<long, byte>();
+
+            DirectoryInfo di = new DirectoryInfo(Path.GetDirectoryName(_path));
+            if (!di.Exists)
+            {
+                di.Create();
+            }
         }
 
         /// <inheritDoc />
@@ -39,8 +47,14 @@ namespace Abot.Core
         /// <inheritDoc />
         public bool AddIfNew(Uri uri)
         {
-            Serialize();
-            return m_UrlRepository.TryAdd(ComputeNumericId(uri.AbsoluteUri), 0);
+            bool result = m_UrlRepository.TryAdd(ComputeNumericId(uri.AbsoluteUri), 0);
+
+            if (result && m_UrlRepository.Count % _interval == 0)
+            {
+                Serialize(m_UrlRepository, _path);
+            }
+
+            return result;
         }
 
         /// <inheritDoc />
@@ -70,32 +84,15 @@ namespace Abot.Core
             }
         }
 
-        private void Serialize()
+        private void Serialize(ConcurrentDictionary<long, byte> M_UrlRepository, string FullPath)
         {
-            if (_path == string.Empty) return;
-
-            if (m_UrlRepository.Count % _interval == 0)
-            {
-                string serialized = JsonConvert.SerializeObject(m_UrlRepository);
-                File.WriteAllText(_path, serialized);
-            }
+            string serialized = JsonConvert.SerializeObject(M_UrlRepository);
+            File.WriteAllText(FullPath, serialized);
         }
 
-        private void Deserialize()
+        private ConcurrentDictionary<long, byte> Deserialize(string FullPath)
         {
-            if (_path == string.Empty) return;
-
-            var di = new DirectoryInfo(Path.GetDirectoryName(_path));
-            if (!di.Exists)
-            {
-                di.Create();
-                return;
-            }
-
-            if (File.Exists(_path))
-            {
-                m_UrlRepository = JsonConvert.DeserializeObject<ConcurrentDictionary<long, byte>>(File.ReadAllText(_path));
-            }
+            return JsonConvert.DeserializeObject<ConcurrentDictionary<long, byte>>(File.ReadAllText(_path));
         }
     }
 }
